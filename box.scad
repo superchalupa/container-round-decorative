@@ -1,5 +1,9 @@
-production=0;
+debug=1;
 layout="preview";
+
+echo ("Running build");
+echo (layout);
+echo (debug);
 
 use <pins.scad>;
 
@@ -31,8 +35,7 @@ module spiro(radius, lineWidth, height, steps) {
     }
 }
 
-
-steps=production * 14 + 6;
+steps=20;
 
 radius=35;
 lineWidth=1.5;
@@ -49,7 +52,6 @@ module box() {
 		        translate([0,0,-bracelet_thick/2-smidgen])cylinder(h=bracelet_thick+2*smidgen,r=radius,$fn=36);
                 translate([0,0,bracelet_thick/2-1]) cylinder(h=10,r=radius+10);
 	        }
-if(production) {
     	    for (i=[0:19]) {
     		    rotate([60,0,i*18])translate([-1,0,0])rotate([0,90,0])scale([0.5,2,2])cylinder(25,3,3,$fn=24);
     		    rotate([60,0,i*18+11])translate([-1,0,12])rotate([0,90,0])scale([0.5,2,2])cylinder(25,3,3,$fn=24);
@@ -57,15 +59,16 @@ if(production) {
     		    rotate([60,0,i*18+5.5])translate([-1,0,-18])rotate([0,90,0])scale([0.4,0.75,0.75])cylinder(70,3,3,$fn=24);
     		    rotate([60,0,i*18-5.5])translate([-1,0,18])rotate([0,90,0])scale([0.4,0.75,0.75])cylinder(70,3,3,$fn=24);
     	    }
-}
+        // Make the hole in the side for the pin
         translate([radius-2,0,bracelet_thick/2-1 + smidgen])
             rotate([180,0,0])
                 pinhole(h=10,r=4,lh=3,lt=1);
        
         }
 
+        // the bottom spiro graph
         spiro(radius/2 + 0.5, lineWidth, bottomThick, steps);
-        cylinder(1,radius+smidgen);
+        cylinder(h=1,r=radius+1);
         tube(radius+1, lineWidth, bottomThick);
 
         translate([radius-2,0,0])
@@ -95,11 +98,11 @@ if (layout=="preview"){
             box_lid();
 }
 
-if (layout=="box.stl"){
+if (layout=="box"){
     box();
 }
 
-if (layout=="lid.stl"){
+if (layout=="lid"){
     box_lid();
 }
 
