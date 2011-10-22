@@ -1,16 +1,15 @@
 all: lid.stl box.stl
+lid.stl: box.scad
+	openscad -s $@ $< -Dlayout=\"$$(basename $@ .stl)\"
+
+box.scad: container_module.scad
+container_module.scad: pins.scad
+pins.scad:
+	sh ./get_thing.sh 10541
+	ln -s Pin\ Connectors\ V2\ by\ tbuser\ -\ Thingiverse\:10541/pins.scad ./pins.scad
 
 clean:
-	rm *.stl
-
-lid.stl: box.scad
-	openscad -s $@ $< -d deps-$$(basename $@ .stl).mk -Dsteps=20 -Dddebug=0 -Dlayout=\"$$(basename $@ .stl)\" -Dnum_divisions_around=20
+	rm *.stl *.gcode
 
 %.stl: %.scad
-	openscad -s $@ $< -d deps-$$(basename $@ .stl).mk -Dsteps=20 -Dddebug=0 -Dlayout=\"$$(basename $@ .stl)\" -Dnum_divisions_around=20
-
-deps-%.mk: %.stl
-
--include deps-box.mk
--include deps-lid.mk
-
+	openscad -s $@ $< -Dlayout=\"$$(basename $@ .stl)\"
