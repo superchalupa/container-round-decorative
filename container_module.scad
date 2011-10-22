@@ -37,14 +37,11 @@ module spiro(radius, spiro_line_width, height, steps) {
 
 smidgen = 0.1;
 
-module holySquishedHollowTorus(box_height, radius, wall_thick, bottom_buffer) {
-    oval_maj_rad=6;
-    distance_between=1;
-    rotate_angle = 60;
-    num_around = 22;
-    y_step = sin(rotate_angle) * (oval_maj_rad*2+distance_between);
+module holySquishedHollowTorus(box_height, radius, wall_thick, bottom_buffer, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) {
+    oval_maj_rad=hole_len/2;
+    y_step = sin(hole_rotation_angle) * (oval_maj_rad*2+distance_between_holes);
     num_big_ovals = floor((box_height-(bottom_buffer+1)*2)/y_step);
-    degrees_per_y =  360 * tan(90-rotate_angle) / (2 * 3.141592 * radius);
+    degrees_per_y =  360 * tan(90-hole_rotation_angle) / (2 * 3.141592 * radius);
     leftover = box_height - (num_big_ovals*12);
     echo ("y_step: ", y_step);
     echo ("num big ovals: ", num_big_ovals);
@@ -57,12 +54,12 @@ module holySquishedHollowTorus(box_height, radius, wall_thick, bottom_buffer) {
 
         // Ok, this was a pain to come up with, but basically here we chop holes in the sides
         // outer loop chops the individual layers
-        for (i=[0:num_around-1]) {
+        for (i=[0:num_divisions_around-1]) {
             // first row
             for (j=[0:num_big_ovals-1]) {
-                rotate([0,0,i*(360/num_around)+j*(degrees_per_y*y_step)])
+                rotate([0,0,i*(360/num_divisions_around)+j*(degrees_per_y*y_step)])
                     translate([0,0,-box_height/2 + leftover/2 + y_step/2 + j*y_step])
-                        rotate([rotate_angle,0,0])
+                        rotate([hole_rotation_angle,0,0])
                         rotate([0,90,0])
                             scale([1.5,oval_maj_rad,1])
                                 cylinder(h=radius*2,r=1,$fn=24);
@@ -70,9 +67,9 @@ module holySquishedHollowTorus(box_height, radius, wall_thick, bottom_buffer) {
 
             // The 'odd' row (starts with half oval, but we skip that in this loop)
             for (j=[0:num_big_ovals-2]) {
-                rotate([0,0,(i+0.5)*(360/num_around)+j*(degrees_per_y*y_step)+degrees_per_y*y_step/2])
+                rotate([0,0,(i+0.5)*(360/num_divisions_around)+j*(degrees_per_y*y_step)+degrees_per_y*y_step/2])
                     translate([0,0,-box_height/2 + leftover/2 + y_step + j*y_step])
-                        rotate([rotate_angle,0,0])
+                        rotate([hole_rotation_angle,0,0])
                         rotate([0,90,0])
                             scale([1.5,oval_maj_rad,1])
                                 cylinder(h=radius*2,r=1,$fn=24);
@@ -80,18 +77,18 @@ module holySquishedHollowTorus(box_height, radius, wall_thick, bottom_buffer) {
 
             // here we get the odd half-sized ones on the bottom
             // uses same formula as above, but I simplified couple terms manually
-            rotate([0,0,(i+0.5)*(360/num_around)-degrees_per_y*y_step/4])
+            rotate([0,0,(i+0.5)*(360/num_divisions_around)-degrees_per_y*y_step/4])
                 translate([0,0,-box_height/2 + leftover/2 + y_step/4])
-                rotate([rotate_angle,0,0])
+                rotate([hole_rotation_angle,0,0])
                 rotate([0,90,0])
                 scale([1.5,oval_maj_rad/2,1])
                 cylinder(h=radius*2,r=1,$fn=24);
 
             // here we get the odd half-sized ones on the top
             // uses same formula as above, but I simplified couple terms manually
-            rotate([0,0,(i+0.5)*(360/num_around)+(num_big_ovals-1)*(degrees_per_y*y_step)+degrees_per_y*y_step/4])
+            rotate([0,0,(i+0.5)*(360/num_divisions_around)+(num_big_ovals-1)*(degrees_per_y*y_step)+degrees_per_y*y_step/4])
                 translate([0,0,-box_height/2 + leftover/2 + y_step + (num_big_ovals-1)*y_step - y_step/4])
-                rotate([rotate_angle,0,0])
+                rotate([hole_rotation_angle,0,0])
                 rotate([0,90,0])
                 scale([1.5,oval_maj_rad/2,1])
                 cylinder(h=radius*2,r=1,$fn=24);
@@ -99,10 +96,11 @@ module holySquishedHollowTorus(box_height, radius, wall_thick, bottom_buffer) {
     }
 }
 
-module container(box_height, radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width) {
+module container(box_height, radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) 
+{
     union() {
         difference() {
-            holySquishedHollowTorus(box_height, radius, wall_thick, bottom_thick);
+            holySquishedHollowTorus(box_height, radius, wall_thick, bottom_thick, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around);
             translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius,$fn=36);
             translate([0,0,box_height-bottom_thick]) cylinder(h=bottom_thick+10,r=radius+10);
 
@@ -140,7 +138,7 @@ module container_lid(box_height, radius, bottom_thick, spiro_steps, spiro_line_w
         translate([0,0,box_height/2])
         difference() {
             squishedHollowTorus(radius, 5, box_height/2, 2);
-            translate([0,0,-box_height/2-smidgen])cylinder(h=box_height+2*smidgen,r=radius,$fn=36);
+            translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius,$fn=36);
             translate([0,0,-box_height/2+bottom_thick]) cylinder(h=box_height,r=radius+10);
         }
         spiro(radius/2 + 0.5, spiro_line_width, bottom_thick, spiro_steps);
