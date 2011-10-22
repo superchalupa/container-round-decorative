@@ -12,9 +12,17 @@ smidgen = 0.1;
 
 module squished_solid_torus(major_r, minor_r1, height) {
     translate([0,0,height/2])
-	    rotate_extrude(convexity = 10, $fn = 144)
+	    rotate_extrude(convexity = 10)
 	    translate([major_r, 0, 0])
-	    scale([minor_r1,height/2,height/2]) circle(r = 1, $fn = 144);
+
+        // openscad formula for picking # of fragments to render doesnt appear
+        // to work very well in the presence of scaling. So, instead of using a
+        // unit circle, use a bit bigger so we get enough fragments dont be
+        // confused here, circle radius (r) would normally be "1" and then
+        // scaled from there (by [minor_r2,height/2,height/2]). But to get a
+        // reasonable number of fragments, I'm using r=major_r, then scaling
+        // from there
+	    scale([minor_r1/major_r,height/(major_r*2),height/(major_r*2)]) circle(r = major_r);
 }
 
 module squished_hollow_torus(major_r, minor_r1, height, thick) {
@@ -39,10 +47,10 @@ module spiro(radius, spiro_line_width, height, steps) {
     }
 }
 
-module holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_buffer, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) {
+module holy_squished_hollow_torus(box_height, radius, wall_thick, edge_buffer, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) {
     oval_maj_rad=hole_len/2;
     y_step = sin(hole_rotation_angle) * (oval_maj_rad*2+distance_between_holes);
-    num_big_ovals = floor((box_height-(bottom_buffer+1)*2)/y_step);
+    num_big_ovals = floor((box_height-edge_buffer*2)/y_step);
     degrees_per_y =  360 * tan(90-hole_rotation_angle) / (2 * 3.141592 * radius);
     leftover = box_height - (num_big_ovals*12);
     echo ("y_step: ", y_step);
@@ -62,8 +70,8 @@ module holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_buffer,
                     translate([0,0,leftover/2 + y_step/2 + j*y_step])
                         rotate([hole_rotation_angle,0,0])
                         rotate([0,90,0])
-                            scale([1.5,oval_maj_rad,1])
-                                cylinder(h=radius*2,r=1,$fn=24);
+                            scale([1.5/oval_maj_rad,1,1])
+                                cylinder(h=radius*2,r=oval_maj_rad);
             }
 
             // The 'odd' row (starts with half oval, but we skip that in this loop)
@@ -72,8 +80,8 @@ module holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_buffer,
                     translate([0,0,leftover/2 + y_step + j*y_step])
                         rotate([hole_rotation_angle,0,0])
                         rotate([0,90,0])
-                            scale([1.5,oval_maj_rad,1])
-                                cylinder(h=radius*2,r=1,$fn=24);
+                            scale([1.5/oval_maj_rad,1,1])
+                                cylinder(h=radius*2,r=oval_maj_rad);
             }
 
             // here we get the odd half-sized ones on the bottom
@@ -82,8 +90,8 @@ module holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_buffer,
                 translate([0,0,leftover/2 + y_step/4])
                 rotate([hole_rotation_angle,0,0])
                 rotate([0,90,0])
-                scale([1.5,oval_maj_rad/2,1])
-                cylinder(h=radius*2,r=1,$fn=24);
+                scale([1.5/oval_maj_rad,1/2,1])
+                cylinder(h=radius*2,r=oval_maj_rad);
 
             // here we get the odd half-sized ones on the top
             // uses same formula as above, but I simplified couple terms manually
@@ -91,8 +99,8 @@ module holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_buffer,
                 translate([0,0,leftover/2 + y_step + (num_big_ovals-1)*y_step - y_step/4])
                 rotate([hole_rotation_angle,0,0])
                 rotate([0,90,0])
-                scale([1.5,oval_maj_rad/2,1])
-                cylinder(h=radius*2,r=1,$fn=24);
+                scale([1.5/oval_maj_rad,1/2,1])
+                cylinder(h=radius*2,r=oval_maj_rad);
         }
     }
 }
@@ -101,8 +109,8 @@ module container(box_height, radius, wall_thick, bottom_thick, spiro_steps, spir
 {
     union() {
         difference() {
-            holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_thick, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around);
-            translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius,$fn=36);
+            holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_thick+1, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around);
+            translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
             translate([0,0,box_height-bottom_thick]) cylinder(h=bottom_thick+10,r=radius+10);
 
             // Make the hole in the side for the pin
@@ -171,7 +179,7 @@ module container_lid(box_height, radius, bottom_thick, wall_thick, spiro_steps, 
     union() {
         difference() {
             squished_hollow_torus(radius, 5, box_height, 2);
-            translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius,$fn=36);
+            translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
             translate([0,0,bottom_thick]) cylinder(h=box_height,r=radius+10);
         }
 

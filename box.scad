@@ -3,6 +3,8 @@ echo ("Running build for layout", layout);
 
 use <container_module.scad>;
 
+$fa=1;
+
 box_height=70;
 radius=40;
 wall_thick=2;
