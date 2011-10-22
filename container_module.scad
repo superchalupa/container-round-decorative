@@ -134,6 +134,16 @@ module container(box_height, radius, wall_thick, bottom_thick, spiro_steps, spir
     }
 }
 
+module detents(radius, wall_thick,negative=0)
+{
+        // detents
+        z_trans=negative * -1;
+        translate([-wall_thick/2,radius-wall_thick/2, z_trans])
+            cube( [ wall_thick,  wall_thick/2,        1]);
+        translate([-wall_thick/2,-radius,             z_trans])
+            cube( [ wall_thick,  wall_thick/2,        1]);
+}
+
 module container_lid(box_height, radius, bottom_thick, spiro_steps, spiro_line_width) {
     union() {
         translate([0,0,box_height/2])
@@ -148,6 +158,8 @@ module container_lid(box_height, radius, bottom_thick, spiro_steps, spiro_line_w
         translate([radius-2,0,bottom_thick])
             pin(h=10,r=4,lh=3,lt=1);
         tube(radius+1, spiro_line_width, bottom_thick);
+        translate([0,0,bottom_thick])
+            detents(radius, wall_thick,negative=0);
     }
 }
 
