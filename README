@@ -1,9 +1,16 @@
 This is an openscad design for a decorative box.
 
-This design uses the pin connectors from Thingiverse thing:10541. To get these, I have included a handy-dandy script. Run the get_thing.sh script to get it (works on linux, works on macos if you install wget), and then symlink the 'pins.scad' file. After you have everything, run 'make' to create the default STL, or edit the container.scad file to create a custom box.
+This design uses the pin connectors library from Thingiverse thing:10541. The makefile will automatically download it for you if you dont have it, just run 'make'.
+
+
+To Manually Download pins.scad using script:
+
+To get these, I have included a handy-dandy script. Run the get_thing.sh script to get it (works on linux, works on macos if you install wget), and then symlink the 'pins.scad' file. After you have everything, run 'make' to create the default STL, or edit the container.scad file to create a custom box.
 
 $ ./get_thing.sh 10541
     ... cut download bits ...
 $ ln -s Pin\ Connectors\ V2\ by\ tbuser\ -\ Thingiverse\:10541/pins.scad ./pins.scad
 $ make
 
+
+If you have already downloaded this library someplace else, you can just symlink it into this directory
