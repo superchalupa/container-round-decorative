@@ -1,4 +1,4 @@
-layout="lid";
+layout="preview";
 echo ("Running build for layout", layout);
 
 use <container_module.scad>;
@@ -13,7 +13,7 @@ spiro_line_width=1.5;
 hole_len=12;
 distance_between_holes=1;
 hole_rotation_angle = 60;
-num_divisions_around = 0;
+num_divisions_around = 2;
 
 if (layout=="preview"){
     container(box_height=box_height, 
