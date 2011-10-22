@@ -7,6 +7,9 @@ echo (debug);
 
 use <pins.scad>;
 
+// use this when subtracting surfaces and we want to make sure they dont coincide
+smidgen = 0.1;
+
 module squishedSolidTorus(major_r, minor_r1, minor_r2) {
 	rotate_extrude(convexity = 10, $fn = 144)
 	    translate([major_r, 0, 0])
@@ -34,8 +37,6 @@ module spiro(radius, spiro_line_width, height, steps) {
             translate([radius,0,0]) tube(radius,spiro_line_width,height);
     }
 }
-
-smidgen = 0.1;
 
 module holySquishedHollowTorus(box_height, radius, wall_thick, bottom_buffer, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) {
     oval_maj_rad=hole_len/2;
@@ -121,7 +122,7 @@ module container(box_height, radius, wall_thick, bottom_thick, spiro_steps, spir
             // it's a cylinder that merges into the side at 45 deg angle
             cylinder(h=box_height-bottom_thick,r1=7, r2=7);
 
-            translate([0,0,box_height-10-tan(90-55)*7])
+            translate([0,0,box_height-10-tan(55)*7])
                 rotate([0,55,0])
                 translate([-box_height,-box_height,-box_height])
                 cube([box_height*2,box_height*2,box_height]);
