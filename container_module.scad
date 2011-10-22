@@ -1,9 +1,5 @@
-debug=1;
 layout="preview";
-
-echo ("Running build");
-echo (layout);
-echo (debug);
+echo ("Running build for", layout);
 
 use <pins.scad>;
 
