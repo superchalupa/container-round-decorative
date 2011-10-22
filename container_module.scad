@@ -109,6 +109,11 @@ module container(box_height, radius, wall_thick, bottom_thick, spiro_steps, spir
             translate([radius-2,0,box_height-bottom_thick])
                 rotate([180,0,0])
                     pinhole(h=10,r=4,lh=3,lt=1);
+
+            // front latch detent
+            translate([0,0,box_height])
+                rotate([180,0,0])
+                front_latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
         }
 
         // the bottom spiro graph
@@ -144,19 +149,46 @@ module detents(radius, wall_thick,negative=0)
             cube( [ wall_thick,  wall_thick/2,        1]);
 }
 
-module container_lid(box_height, radius, bottom_thick, spiro_steps, spiro_line_width) {
+module front_latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
+        difference() {
+            translate([-radius-wall_thick*2,-5,0])
+                cube([wall_thick*2.5,10,bottom_thick*2.5]); 
+            squished_solid_torus(radius, 5, box_height, 2);
+        }
+        translate([-radius-3*wall_thick/2+.25,0,bottom_thick*2.5-.25])
+            rotate([0,45,0])
+            translate([-wall_thick/2,-5,0])
+            cube([wall_thick,10,1]); 
+        translate([-radius-3*wall_thick/2+.25,0,bottom_thick*2.5])
+            rotate([0,-45,0])
+            translate([-wall_thick/2,-5,0])
+            cube([wall_thick,10,1]); 
+        translate([-radius-wall_thick*2,-5,bottom_thick*2.5-1])
+            cube([wall_thick,10,1]); 
+}
+
+module container_lid(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
     union() {
         difference() {
             squished_hollow_torus(radius, 5, box_height, 2);
             translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius,$fn=36);
             translate([0,0,bottom_thick]) cylinder(h=box_height,r=radius+10);
         }
-        spiro(radius/2 + 0.5, spiro_line_width, bottom_thick, spiro_steps);
+
+        front_latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
+
+        // pin
+        // extra cyl so we dont have coincident faces
         translate([radius-2,0,0])
             cylinder(h=bottom_thick+1,r=4);
         translate([radius-2,0,bottom_thick])
             pin(h=10,r=4,lh=3,lt=1);
+
+        // outside tube and spirograph
         tube(radius+1, spiro_line_width, bottom_thick);
+        spiro(radius/2 + 0.5, spiro_line_width, bottom_thick, spiro_steps);
+
+        // detents
         translate([0,0,bottom_thick])
             detents(radius, wall_thick,negative=0);
     }
