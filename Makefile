@@ -1,4 +1,4 @@
-all: box.stl lid.stl
+all: lid.stl box.stl
 
 clean:
 	rm *.stl
