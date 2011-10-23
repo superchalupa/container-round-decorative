@@ -3,7 +3,9 @@ echo ("Running build for layout", layout);
 
 use <container_module.scad>;
 
-$fa=1;
+//$fs=1;    // minimum fragment size
+//$fa=12;   // minimum fragment angle
+//$fn=0;   // exact number of segments to use. '0' means use $fs and $fa
 
 box_height=70;
 radius=40;
