@@ -6,6 +6,11 @@ use <pins.scad>;
 // use this when subtracting surfaces and we want to make sure they dont coincide
 smidgen = 0.1;
 
+// use this when parts have to fit together 
+fitting_windage_loose=0.350;
+fitting_windage_snug=0.250;
+
+
 module squished_solid_torus(major_r, minor_r1, height) {
     translate([0,0,height/2])
 	    rotate_extrude(convexity = 10)
@@ -48,7 +53,7 @@ module holy_squished_hollow_torus(box_height, radius, wall_thick, edge_buffer, h
     y_step = sin(hole_rotation_angle) * (oval_maj_rad*2+distance_between_holes);
     num_big_ovals = floor((box_height-edge_buffer*2)/y_step);
     degrees_per_y =  360 * tan(90-hole_rotation_angle) / (2 * 3.141592 * radius);
-    leftover = box_height - (num_big_ovals*12);
+    leftover = box_height - (num_big_ovals*hole_len);
     echo ("y_step: ", y_step);
     echo ("num big ovals: ", num_big_ovals);
     echo ("degrees_per_y", degrees_per_y);
@@ -107,7 +112,7 @@ module container(box_height, radius, wall_thick, bottom_thick, spiro_steps, spir
         difference() {
             holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_thick+1, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around);
             translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
-            translate([0,0,box_height-bottom_thick]) cylinder(h=bottom_thick+10,r=radius+10);
+            translate([0,0,box_height-bottom_thick-fitting_windage_snug]) cylinder(h=bottom_thick+10,r=radius+10);
 
             // Make the hole in the side for the pin
             translate([radius-2,0,box_height-bottom_thick])
