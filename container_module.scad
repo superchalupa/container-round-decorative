@@ -12,8 +12,13 @@ fitting_windage_snug=0.250;
 
 
 module squished_solid_torus(major_r, minor_r1, height) {
+    // manually calculate how many fragments to use to render circumference, 
+    // as openscad gets this wrong
+    circumference = (major_r+minor_r1) * 2 * 3.1415926;
+    degrees_per_mm_of_circ = 360 / circumference;
+
     translate([0,0,height/2])
-	    rotate_extrude(convexity = 10)
+	    rotate_extrude(convexity = 2, $fa=degrees_per_mm_of_circ, $fs=1)
 	    translate([major_r, 0, 0])
 
         // openscad formula for picking # of fragments to render doesnt appear
