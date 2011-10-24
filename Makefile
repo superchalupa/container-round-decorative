@@ -1,8 +1,8 @@
-all: lid.stl box.stl
+all: lid.stl box.stl bracelet.stl
 lid.stl: box.scad
-	openscad -s $@ $< -Dlayout=\"$$(basename $@ .stl)\"
+	openscad -o $@ $< -Dlayout=\"$$(basename $@ .stl)\"
 
-box.scad: container_module.scad
+bracelet.scad box.scad: container_module.scad
 container_module.scad: pins.scad
 pins.scad:
 	sh ./get_thing.sh 10541
@@ -12,4 +12,4 @@ clean:
 	rm *.stl *.gcode
 
 %.stl: %.scad
-	openscad -s $@ $< -Dlayout=\"$$(basename $@ .stl)\"
+	openscad -o $@ $< -Dlayout=\"$$(basename $@ .stl)\"
