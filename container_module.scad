@@ -18,7 +18,7 @@ module squished_solid_torus(major_r, minor_r1, height) {
     degrees_per_mm_of_circ = 360 / circumference;
 
     translate([0,0,height/2])
-	    rotate_extrude(convexity = 2, $fa=degrees_per_mm_of_circ, $fs=1)
+	    rotate_extrude(convexity = 2)   // , $fa=degrees_per_mm_of_circ, $fs=1, $fn=36)
 	    translate([major_r, 0, 0])
 
         // openscad formula for picking # of fragments to render doesnt appear
@@ -28,13 +28,15 @@ module squished_solid_torus(major_r, minor_r1, height) {
         // scaled from there (by [minor_r2,height/2,height/2]). But to get a
         // reasonable number of fragments, I'm using r=major_r, then scaling
         // from there
-	    scale([minor_r1/major_r,height/(major_r*2),height/(major_r*2)]) circle(r = major_r);
+	    scale([minor_r1/major_r,height/(major_r*2),height/(major_r*2)]) 
+        circle(r = major_r);
 }
 
 module squished_hollow_torus(major_r, minor_r1, height, thick) {
 	difference() {
 		squished_solid_torus(major_r, minor_r1,       height);
-		squished_solid_torus(major_r, minor_r1-thick, height-thick);
+        translate([0,0,thick/2])
+		    squished_solid_torus(major_r, minor_r1-thick, height-thick);
 	}
 }
 
@@ -53,22 +55,23 @@ module spiro(radius, spiro_line_width, height, steps) {
     }
 }
 
-module holy_squished_hollow_torus(box_height, radius, wall_thick, edge_buffer, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) {
+module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_buffer=3, hole_len=12, distance_between_holes=1, hole_rotation_angle=60, num_divisions_around=20, minor_radius=5) {
     oval_maj_rad=hole_len/2;
     y_step = sin(hole_rotation_angle) * (oval_maj_rad*2+distance_between_holes);
     num_big_ovals = floor((box_height-edge_buffer*2)/y_step);
     degrees_per_y =  360 * tan(90-hole_rotation_angle) / (2 * 3.141592 * radius);
-    leftover = box_height - (num_big_ovals*hole_len);
+    leftover = box_height - (num_big_ovals*(hole_len+distance_between_holes));
     echo ("y_step: ", y_step);
     echo ("num big ovals: ", num_big_ovals);
-    echo ("degrees_per_y", degrees_per_y);
+    echo ("degrees_per_y_unit", degrees_per_y);
     echo ("leftover", leftover);
 
     difference() {
-        squished_hollow_torus(radius, 5, box_height, wall_thick);
+        squished_hollow_torus(radius, minor_radius, box_height, wall_thick);
 
         // Ok, this was a pain to come up with, but basically here we chop holes in the sides
-        // outer loop chops the individual layers
+        // outer loop copies each individual vertical 'line' around the circumference
+        // inner loop does one individual 'line' of holes going up
         for (i=[0:num_divisions_around-1]) {
             // first row
             for (j=[0:num_big_ovals-1]) {
