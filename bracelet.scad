@@ -6,7 +6,7 @@ use <container_module.scad>;
 
 
 // for my 3 year old (small)
-inside_radius=20;
+inside_radius=24;
 
 bracelet_width=35;
 wall_thick=3;

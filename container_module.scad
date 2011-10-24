@@ -18,7 +18,7 @@ module squished_solid_torus(major_r, minor_r1, height) {
     degrees_per_mm_of_circ = 360 / circumference;
 
     translate([0,0,height/2])
-	    rotate_extrude(convexity = 2)   // , $fa=degrees_per_mm_of_circ, $fs=1, $fn=36)
+	    rotate_extrude(convexity = 2, $fs=$fs/3, $fa=$fa/3)
 	    translate([major_r, 0, 0])
 
         // openscad formula for picking # of fragments to render doesnt appear
@@ -29,7 +29,7 @@ module squished_solid_torus(major_r, minor_r1, height) {
         // reasonable number of fragments, I'm using r=major_r, then scaling
         // from there
 	    scale([minor_r1/major_r,height/(major_r*2),height/(major_r*2)]) 
-        circle(r = major_r);
+        circle(r = major_r, $fs=$fs/1.5, $fa=$fa/1.5);
 }
 
 module squished_hollow_torus(major_r, minor_r1, height, thick) {
@@ -80,7 +80,7 @@ module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_b
                         rotate([hole_rotation_angle,0,0])
                         rotate([0,90,0])
                             scale([1.5/oval_maj_rad,1,1])
-                                cylinder(h=radius*2,r=oval_maj_rad);
+                                cylinder(h=radius+minor_radius+smidgen,r1=0, r2=oval_maj_rad);
             }
 
             // The 'odd' row (starts with half oval, but we skip that in this loop)
@@ -90,7 +90,7 @@ module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_b
                         rotate([hole_rotation_angle,0,0])
                         rotate([0,90,0])
                             scale([1.5/oval_maj_rad,1,1])
-                                cylinder(h=radius*2,r=oval_maj_rad);
+                                cylinder(h=radius+minor_radius+smidgen,r1=0, r2=oval_maj_rad);
             }
 
             // here we get the odd half-sized ones on the bottom
@@ -100,7 +100,7 @@ module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_b
                 rotate([hole_rotation_angle,0,0])
                 rotate([0,90,0])
                 scale([1.5/oval_maj_rad,1/2,1])
-                cylinder(h=radius*2,r=oval_maj_rad);
+                cylinder(h=radius+minor_radius+smidgen,r1=0, r2=oval_maj_rad);
 
             // here we get the odd half-sized ones on the top
             // uses same formula as above, but I simplified couple terms manually
@@ -109,7 +109,7 @@ module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_b
                 rotate([hole_rotation_angle,0,0])
                 rotate([0,90,0])
                 scale([1.5/oval_maj_rad,1/2,1])
-                cylinder(h=radius*2,r=oval_maj_rad);
+                cylinder(h=radius+minor_radius+smidgen,r1=0, r2=oval_maj_rad);
         }
     }
 }
