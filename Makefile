@@ -2,6 +2,7 @@ all: lid.stl box.stl bracelet.stl
 lid.stl: box.scad
 	openscad -o $@ $< -Dlayout=\"$$(basename $@ .stl)\"
 
+box.stl: box.scad container_module.scad
 bracelet.scad box.scad: container_module.scad
 container_module.scad: pins.scad
 pins.scad:

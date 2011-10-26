@@ -67,7 +67,7 @@ module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_b
     echo ("leftover", leftover);
 
     difference() {
-        squished_hollow_torus(radius, minor_radius, box_height, wall_thick);
+        squished_solid_torus(radius, minor_radius, box_height, wall_thick);
 
         // Ok, this was a pain to come up with, but basically here we chop holes in the sides
         // outer loop copies each individual vertical 'line' around the circumference
@@ -114,7 +114,7 @@ module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_b
     }
 }
 
-module container(box_height, radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) 
+module container_with_latches(box_height, radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) 
 {
     pinhole_height = 10;
     pinhole_inside_radius = 4;
@@ -129,15 +129,47 @@ module container(box_height, radius, wall_thick, bottom_thick, spiro_steps, spir
             translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
             translate([0,0,box_height-bottom_thick-fitting_windage_snug]) cylinder(h=bottom_thick+10,r=radius+10);
 
-            // Make the hole in the side for the pin
-            translate([radius-2,0,box_height-bottom_thick])
-                rotate([180,0,0])
-                    pinhole(h=pinhole_height,r=pinhole_inside_radius,lh=3,lt=1);
-
-            // front latch detent
             translate([0,0,box_height])
                 rotate([180,0,0])
-                front_latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
+                container_lid_with_latches(box_height=box_height,
+                      radius=radius,
+                      wall_thick=wall_thick,
+                      bottom_thick=bottom_thick,
+                      spiro_steps=spiro_steps,
+                      spiro_line_width=spiro_line_width);
+        }
+
+        // the bottom spiro graph
+        spiro(radius/2 + 0.5, spiro_line_width, bottom_thick, spiro_steps);
+        cylinder(h=1,r=radius+1);
+        tube(radius+1, spiro_line_width, bottom_thick);
+    }
+}
+
+
+module container_with_pin(box_height, radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) 
+{
+    pinhole_height = 10;
+    pinhole_inside_radius = 4;
+    pinhole_wall_thick=3;
+    cube_s = 2*(pinhole_inside_radius+pinhole_wall_thick)*1.5; // approximate sqrt(2) = 1.5
+    pin_attachment_h = pinhole_height+2*(pinhole_inside_radius+pinhole_wall_thick);
+    minor_radius=5;
+
+    union() {
+        difference() {
+            holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_thick+3, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around, minor_radius);
+            translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
+            translate([0,0,box_height-bottom_thick-fitting_windage_snug]) cylinder(h=bottom_thick+10,r=radius+10);
+
+            translate([0,0,box_height])
+                rotate([180,0,0])
+                container_lid_with_pin(box_height=box_height,
+                      radius=radius,
+                      wall_thick=wall_thick,
+                      bottom_thick=bottom_thick,
+                      spiro_steps=spiro_steps,
+                      spiro_line_width=spiro_line_width);
         }
 
         // the bottom spiro graph
@@ -150,20 +182,22 @@ module container(box_height, radius, wall_thick, bottom_thick, spiro_steps, spir
         difference() {
             // it's a cylinder that merges into the side at 45 deg angle
             cylinder(h=pin_attachment_h,r=pinhole_inside_radius + pinhole_wall_thick);
-
+        
             translate([0,0,pinhole_inside_radius+pinhole_wall_thick])
                 rotate([0,45,0])
                 translate([0,0,-(sqrt(2)*(pinhole_inside_radius+pinhole_wall_thick)-smidgen)/2])
                 cube([cube_s, cube_s,sqrt(2)*(pinhole_inside_radius+pinhole_wall_thick)+smidgen], center=true);
-
+        
             translate([0,0,pinhole_height+pin_attachment_h])
                 rotate([180,0,0])
                 pinhole(h=pinhole_height,r=pinhole_inside_radius,lh=3,lt=1, tight=true);
-
+        
             cylinder(h=pin_attachment_h+1,r=pinhole_inside_radius);
         }
     }
 }
+
+
 
 module detents(radius, wall_thick,negative=0)
 {
@@ -175,7 +209,7 @@ module detents(radius, wall_thick,negative=0)
             cube( [ wall_thick,  wall_thick/2,        1]);
 }
 
-module front_latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
+module latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
     clip_r = 7*minor_radius/12;
     clip_midpoint_h = 5;
     clip_w = 10;
@@ -191,13 +225,13 @@ module front_latch(box_height, radius, minor_radius, bottom_thick, wall_thick, s
             rotate([90,0,0])
                 cylinder(h=10,r=clip_r,center=true,$fn=10);
 
-            translate([ -2*clip_r,  -clip_w,  -clip_r  -smidgen])
+            translate([ -2*clip_r-smidgen,  -clip_w,  -clip_r  -smidgen])
                 cube([2*clip_r, 2*clip_w, 2*clip_r+2*smidgen]);
         }
     }
 }
 
-module container_lid(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
+module container_lid_with_latches(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
     union() {
         difference() {
             squished_hollow_torus(radius, 5, box_height, 2);
@@ -205,8 +239,30 @@ module container_lid(box_height, radius, bottom_thick, wall_thick, spiro_steps, 
             translate([0,0,bottom_thick]) cylinder(h=box_height,r=radius+10);
         }
 
-        front_latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
+        latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
+        rotate([0,0,180])
+            latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
 
+        // outside tube and spirograph
+        tube(radius+1, spiro_line_width, bottom_thick);
+        spiro(radius/2 + 0.5, spiro_line_width, bottom_thick, spiro_steps);
+
+        // detents
+        translate([0,0,bottom_thick])
+            detents(radius, wall_thick,negative=0);
+    }
+}
+
+module container_lid_with_pin(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
+    union() {
+        difference() {
+            squished_hollow_torus(radius, 5, box_height, 2);
+            translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
+            translate([0,0,bottom_thick]) cylinder(h=box_height,r=radius+10);
+        }
+
+        latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
+        
         // pin
         // extra cyl so we dont have coincident faces
         translate([radius-2,0,0])
