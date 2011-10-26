@@ -60,7 +60,7 @@ module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_b
     y_step = sin(hole_rotation_angle) * (oval_maj_rad*2+distance_between_holes);
     num_big_ovals = floor((box_height-edge_buffer*2)/y_step);
     degrees_per_y =  360 * tan(90-hole_rotation_angle) / (2 * 3.141592 * radius);
-    leftover = box_height - (num_big_ovals*(hole_len+distance_between_holes));
+    leftover = box_height - (num_big_ovals*(y_step));
     echo ("y_step: ", y_step);
     echo ("num big ovals: ", num_big_ovals);
     echo ("degrees_per_y_unit", degrees_per_y);
@@ -125,7 +125,7 @@ module container(box_height, radius, wall_thick, bottom_thick, spiro_steps, spir
 
     union() {
         difference() {
-            holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_thick+1, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around, minor_radius);
+            holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_thick+3, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around, minor_radius);
             translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
             translate([0,0,box_height-bottom_thick-fitting_windage_snug]) cylinder(h=bottom_thick+10,r=radius+10);
 
