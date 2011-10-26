@@ -77,20 +77,20 @@ module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_b
             for (j=[0:num_big_ovals-1]) {
                 rotate([0,0,i*(360/num_divisions_around)+j*(degrees_per_y*y_step)])
                     translate([0,0,leftover/2 + y_step/2 + j*y_step])
-                        rotate([hole_rotation_angle,0,0])
-                        rotate([0,90,0])
-                            scale([1.5/oval_maj_rad,1,1])
-                                cylinder(h=radius+minor_radius+smidgen,r1=0, r2=oval_maj_rad);
+                    rotate([hole_rotation_angle,0,0])
+                    rotate([0,90,0])
+                    scale([1.5/oval_maj_rad,1,1])
+                    cylinder(h=radius+minor_radius+smidgen,r1=0, r2=oval_maj_rad);
             }
 
             // The 'odd' row (starts with half oval, but we skip that in this loop)
             for (j=[0:num_big_ovals-2]) {
                 rotate([0,0,(i+0.5)*(360/num_divisions_around)+j*(degrees_per_y*y_step)+degrees_per_y*y_step/2])
                     translate([0,0,leftover/2 + y_step + j*y_step])
-                        rotate([hole_rotation_angle,0,0])
-                        rotate([0,90,0])
-                            scale([1.5/oval_maj_rad,1,1])
-                                cylinder(h=radius+minor_radius+smidgen,r1=0, r2=oval_maj_rad);
+                    rotate([hole_rotation_angle,0,0])
+                    rotate([0,90,0])
+                    scale([1.5/oval_maj_rad,1,1])
+                    cylinder(h=radius+minor_radius+smidgen,r1=0, r2=oval_maj_rad);
             }
 
             // here we get the odd half-sized ones on the bottom
