@@ -1,4 +1,4 @@
-layout="box";
+layout="preview";
 echo ("Running build for layout", layout);
 
 use <container_module.scad>;
@@ -14,6 +14,7 @@ wall_thick=3;
 spiro_steps = 20;
 bottom_thick=3;
 spiro_line_width=1.5;
+minor_radius=5;
 
 hole_len=12;
 distance_between_holes=1;
@@ -23,6 +24,7 @@ num_divisions_around = 10;
 if (layout=="preview"){
     container_with_latches(box_height=box_height, 
               radius=radius,
+              minor_radius=minor_radius,
               wall_thick=wall_thick,
               bottom_thick=bottom_thick,
               spiro_steps=spiro_steps,
@@ -35,6 +37,7 @@ if (layout=="preview"){
         rotate([180,0,0])
         container_lid_with_latches(box_height=box_height,
                       radius=radius,
+                      minor_radius=minor_radius,
                       wall_thick=wall_thick,
                       bottom_thick=bottom_thick,
                       spiro_steps=spiro_steps,
@@ -44,6 +47,7 @@ if (layout=="preview"){
 if (layout=="box"){
     container_with_latches(box_height=box_height,
               radius=radius,
+              minor_radius=minor_radius,
               wall_thick=wall_thick,
               bottom_thick=bottom_thick,
               spiro_steps=spiro_steps,
@@ -57,6 +61,7 @@ if (layout=="box"){
 if (layout=="lid"){
     container_lid_with_latches(box_height=box_height,
                   radius=radius,
+                  minor_radius=minor_radius,
                   wall_thick=wall_thick,
                   bottom_thick=bottom_thick,
                   spiro_steps=spiro_steps,

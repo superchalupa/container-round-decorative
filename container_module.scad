@@ -67,7 +67,7 @@ module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_b
     echo ("leftover", leftover);
 
     difference() {
-        squished_solid_torus(radius, minor_radius, box_height, wall_thick);
+        squished_hollow_torus(radius, minor_radius, box_height, wall_thick);
 
         // Ok, this was a pain to come up with, but basically here we chop holes in the sides
         // outer loop copies each individual vertical 'line' around the circumference
@@ -114,15 +114,9 @@ module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_b
     }
 }
 
-module container_with_latches(box_height, radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) 
+module container_with_latches(box_height, radius, minor_radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) 
 {
-    pinhole_height = 10;
-    pinhole_inside_radius = 4;
-    pinhole_wall_thick=3;
-    cube_s = 2*(pinhole_inside_radius+pinhole_wall_thick)*1.5; // approximate sqrt(2) = 1.5
-    pin_attachment_h = pinhole_height+2*(pinhole_inside_radius+pinhole_wall_thick);
-    minor_radius=5;
-
+    echo ("container: minor_radius", minor_radius);
     union() {
         difference() {
             holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_thick+3, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around, minor_radius);
@@ -131,8 +125,10 @@ module container_with_latches(box_height, radius, wall_thick, bottom_thick, spir
 
             translate([0,0,box_height])
                 rotate([180,0,0])
+
                 container_lid_with_latches(box_height=box_height,
                       radius=radius,
+                      minor_radius=minor_radius,
                       wall_thick=wall_thick,
                       bottom_thick=bottom_thick,
                       spiro_steps=spiro_steps,
@@ -147,7 +143,7 @@ module container_with_latches(box_height, radius, wall_thick, bottom_thick, spir
 }
 
 
-module container_with_pin(box_height, radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) 
+module container_with_pin(box_height, radius, minor_radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) 
 {
     pinhole_height = 10;
     pinhole_inside_radius = 4;
@@ -166,6 +162,7 @@ module container_with_pin(box_height, radius, wall_thick, bottom_thick, spiro_st
                 rotate([180,0,0])
                 container_lid_with_pin(box_height=box_height,
                       radius=radius,
+                      minor_radius=minor_radius,
                       wall_thick=wall_thick,
                       bottom_thick=bottom_thick,
                       spiro_steps=spiro_steps,
@@ -209,15 +206,17 @@ module detents(radius, wall_thick,negative=0)
             cube( [ wall_thick,  wall_thick/2,        1]);
 }
 
-module latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
+module latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width)
+{
     clip_r = 7*minor_radius/12;
     clip_midpoint_h = 5;
     clip_w = 10;
+    echo ("latch: minor_radius", minor_radius);
     union() {
         difference() {
             translate([-radius-minor_radius,-(clip_w/2),0])
                 cube([minor_radius,clip_w,bottom_thick+clip_midpoint_h]);
-            squished_solid_torus(radius, minor_radius, box_height, 2);
+            squished_solid_torus(radius, minor_radius, box_height);
         }
 
         translate([-radius-minor_radius,0,bottom_thick+clip_midpoint_h])
@@ -231,12 +230,14 @@ module latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_s
     }
 }
 
-module container_lid_with_latches(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
+module container_lid_with_latches(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width)
+{
+    echo ("lid: minor_radius", minor_radius);
     union() {
 
         // matching curve of box
         difference() {
-            squished_hollow_torus(radius, 5, box_height, 2);
+            squished_solid_torus(radius, minor_radius, box_height);
             translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
             translate([0,0,bottom_thick]) cylinder(h=box_height,r=radius+10);
         }
@@ -245,21 +246,21 @@ module container_lid_with_latches(box_height, radius, bottom_thick, wall_thick, 
         tube(radius+1, spiro_line_width, bottom_thick);
         spiro(radius/2 + 0.5, spiro_line_width, bottom_thick, spiro_steps);
 
-//        latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
-//        rotate([0,0,180])
-//            latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
-//
-//
-//        // detents
-//        translate([0,0,bottom_thick])
-//            detents(radius, wall_thick,negative=0);
+        latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
+        rotate([0,0,180])
+            latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
+
+
+        // detents
+        translate([0,0,bottom_thick])
+            detents(radius, wall_thick,negative=0);
     }
 }
 
-module container_lid_with_pin(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
+module container_lid_with_pin(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
     union() {
         difference() {
-            squished_hollow_torus(radius, 5, box_height, 2);
+            squished_solid_torus(radius, minor_radius, box_height);
             translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
             translate([0,0,bottom_thick]) cylinder(h=box_height,r=radius+10);
         }
