@@ -140,9 +140,9 @@ module container_with_latches(box_height, radius, wall_thick, bottom_thick, spir
         }
 
         // the bottom spiro graph
-        spiro(radius/2 + 0.5, spiro_line_width, bottom_thick, spiro_steps);
-        cylinder(h=1,r=radius+1);
-        tube(radius+1, spiro_line_width, bottom_thick);
+        spiro(radius/2 + 0.4, spiro_line_width, bottom_thick, spiro_steps);
+        cylinder(h=1,r=radius+0.9);
+        tube(radius+1.1, spiro_line_width, bottom_thick);
     }
 }
 
@@ -233,23 +233,26 @@ module latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_s
 
 module container_lid_with_latches(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
     union() {
+
+        // matching curve of box
         difference() {
             squished_hollow_torus(radius, 5, box_height, 2);
             translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
             translate([0,0,bottom_thick]) cylinder(h=box_height,r=radius+10);
         }
 
-        latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
-        rotate([0,0,180])
-            latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
-
         // outside tube and spirograph
         tube(radius+1, spiro_line_width, bottom_thick);
         spiro(radius/2 + 0.5, spiro_line_width, bottom_thick, spiro_steps);
 
-        // detents
-        translate([0,0,bottom_thick])
-            detents(radius, wall_thick,negative=0);
+//        latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
+//        rotate([0,0,180])
+//            latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
+//
+//
+//        // detents
+//        translate([0,0,bottom_thick])
+//            detents(radius, wall_thick,negative=0);
     }
 }
 
