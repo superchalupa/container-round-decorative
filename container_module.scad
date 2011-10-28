@@ -4,7 +4,7 @@ echo ("Running build for", layout);
 use <pins.scad>;
 
 // use this when subtracting surfaces and we want to make sure they dont coincide
-smidgen = 0.1;
+smidgen = 0.5;
 
 // use this when parts have to fit together 
 fitting_windage_loose=0.350;
@@ -55,90 +55,100 @@ module spiro(radius, spiro_line_width, height, steps) {
     }
 }
 
-module holy_squished_hollow_torus(box_height=35, radius=35, wall_thick=3, edge_buffer=3, hole_len=12, distance_between_holes=1, hole_rotation_angle=60, num_divisions_around=20, minor_radius=5) {
+module holes(height=35, radius=35, minor_radius=5, hole_len=12, distance_between_holes=1, hole_rotation_angle=60, num_divisions_around=20) {
     oval_maj_rad=hole_len/2;
     y_step = sin(hole_rotation_angle) * (oval_maj_rad*2+distance_between_holes);
-    num_big_ovals = floor((box_height-edge_buffer*2)/y_step);
+    num_big_ovals = floor(height/y_step);
     degrees_per_y =  360 * tan(90-hole_rotation_angle) / (2 * 3.141592 * radius);
-    leftover = box_height - (num_big_ovals*(y_step));
+    echo ("height: ", height);
     echo ("y_step: ", y_step);
     echo ("num big ovals: ", num_big_ovals);
     echo ("degrees_per_y_unit", degrees_per_y);
-    echo ("leftover", leftover);
 
-    difference() {
-        squished_hollow_torus(radius, minor_radius, box_height, wall_thick);
-
-        // Ok, this was a pain to come up with, but basically here we chop holes in the sides
-        // outer loop copies each individual vertical 'line' around the circumference
-        // inner loop does one individual 'line' of holes going up
-        for (i=[0:num_divisions_around-1]) {
-            // first row
-            for (j=[0:num_big_ovals-1]) {
-                rotate([0,0,i*(360/num_divisions_around)+j*(degrees_per_y*y_step)])
-                    translate([radius-minor_radius-smidgen,0,leftover/2 + y_step/2 + j*y_step])
-                    rotate([hole_rotation_angle,0,0])
-                    rotate([0,90,0])
-                    scale([1.5/oval_maj_rad,1,1])
-                    cylinder(h=minor_radius*2+smidgen*2,r1=oval_maj_rad, r2=oval_maj_rad);
-            }
-
-            // The 'odd' row (starts with half oval, but we skip that in this loop)
-            for (j=[0:num_big_ovals-2]) {
-                rotate([0,0,(i+0.5)*(360/num_divisions_around)+j*(degrees_per_y*y_step)+degrees_per_y*y_step/2])
-                    translate([radius-minor_radius-smidgen,0,leftover/2 + y_step + j*y_step])
-                    rotate([hole_rotation_angle,0,0])
-                    rotate([0,90,0])
-                    scale([1.5/oval_maj_rad,1,1])
-                    cylinder(h=minor_radius*2+smidgen*2,r1=oval_maj_rad, r2=oval_maj_rad);
-            }
-
-            // here we get the odd half-sized ones on the bottom
-            // uses same formula as above, but I simplified couple terms manually
-            rotate([0,0,(i+0.5)*(360/num_divisions_around)-degrees_per_y*y_step/4])
-                translate([radius-minor_radius-smidgen,0,leftover/2 + y_step/4])
+    // Ok, this was a pain to come up with, but basically here we chop holes in the sides
+    // outer loop copies each individual vertical 'line' around the circumference
+    // inner loop does one individual 'line' of holes going up
+    for (i=[0:num_divisions_around-1]) {
+        // first row
+        for (j=[0:num_big_ovals-1]) {
+            rotate([0,0,i*(360/num_divisions_around)+j*(degrees_per_y*y_step)])
+                translate([radius-minor_radius-smidgen,0,y_step/2 + j*y_step])
                 rotate([hole_rotation_angle,0,0])
                 rotate([0,90,0])
-                scale([1.5/oval_maj_rad,1/2,1])
+                scale([1.5/oval_maj_rad,1,1])
                 cylinder(h=minor_radius*2+smidgen*2,r1=oval_maj_rad, r2=oval_maj_rad);
+        }
 
-            // here we get the odd half-sized ones on the top
-            // uses same formula as above, but I simplified couple terms manually
-            rotate([0,0,(i+0.5)*(360/num_divisions_around)+(num_big_ovals-1)*(degrees_per_y*y_step)+degrees_per_y*y_step/4])
-                translate([radius-minor_radius-smidgen,0,leftover/2 + y_step + (num_big_ovals-1)*y_step - y_step/4])
+        // The 'odd' row (starts with half oval, but we skip that in this loop)
+        for (j=[0:num_big_ovals-2]) {
+            rotate([0,0,(i+0.5)*(360/num_divisions_around)+j*(degrees_per_y*y_step)+degrees_per_y*y_step/2])
+                translate([radius-minor_radius-smidgen,0,y_step + j*y_step])
                 rotate([hole_rotation_angle,0,0])
                 rotate([0,90,0])
-                scale([1.5/oval_maj_rad,1/2,1])
+                scale([1.5/oval_maj_rad,1,1])
                 cylinder(h=minor_radius*2+smidgen*2,r1=oval_maj_rad, r2=oval_maj_rad);
+        }
+
+        // here we get the odd half-sized ones on the bottom
+        // uses same formula as above, but I simplified couple terms manually
+        rotate([0,0,(i+0.5)*(360/num_divisions_around)-degrees_per_y*y_step/4])
+            translate([radius-minor_radius-smidgen,0,y_step/4])
+            rotate([hole_rotation_angle,0,0])
+            rotate([0,90,0])
+            scale([1.5/oval_maj_rad,1/2,1])
+            cylinder(h=minor_radius*2+smidgen*2,r1=oval_maj_rad, r2=oval_maj_rad);
+
+        // here we get the odd half-sized ones on the top
+        // uses same formula as above, but I simplified couple terms manually
+        rotate([0,0,(i+0.5)*(360/num_divisions_around)+(num_big_ovals-1)*(degrees_per_y*y_step)+degrees_per_y*y_step/4])
+            translate([radius-minor_radius-smidgen,0,y_step + (num_big_ovals-1)*y_step - y_step/4])
+            rotate([hole_rotation_angle,0,0])
+            rotate([0,90,0])
+            scale([1.5/oval_maj_rad,1/2,1])
+            cylinder(h=minor_radius*2+smidgen*2,r1=oval_maj_rad, r2=oval_maj_rad);
+    }
+}
+
+module generic_container(box_height, radius, minor_radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) 
+{
+    union() {
+        // the bottom spiro graph
+        tube(radius+1, spiro_line_width, bottom_thick);
+        spiro(radius/2, spiro_line_width, bottom_thick, spiro_steps);
+        cylinder(h=1,r=radius+1);
+
+        difference() {
+            squished_hollow_torus(radius, minor_radius, box_height, wall_thick);
+            translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
+            translate([0,0,bottom_thick+3])
+                holes(
+                      height=box_height-(bottom_thick+3)*2,
+                      radius=radius,
+                      minor_radius=minor_radius,
+                      hole_len=hole_len,
+                      distance_between_holes=distance_between_holes,
+                      hole_rotation_angle=hole_rotation_angle,
+                      num_divisions_around=num_divisions_around);
+            translate([0,0,box_height-bottom_thick-fitting_windage_snug]) cylinder(h=bottom_thick+10,r=radius+minor_radius+smidgen);
+
         }
     }
 }
 
-module container_with_latches(box_height, radius, minor_radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) 
+module container_with_latches(box_height, radius, minor_radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around)
 {
-    echo ("container: minor_radius", minor_radius);
-    union() {
-        difference() {
-            holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_thick+3, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around, minor_radius);
-            translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
-            translate([0,0,box_height-bottom_thick-fitting_windage_snug]) cylinder(h=bottom_thick+10,r=radius+10);
+    difference() {
+        generic_container(box_height, radius, minor_radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around);
 
-            translate([0,0,box_height])
-                rotate([180,0,0])
-
-                container_lid_with_latches(box_height=box_height,
-                      radius=radius,
-                      minor_radius=minor_radius,
-                      wall_thick=wall_thick,
-                      bottom_thick=bottom_thick,
-                      spiro_steps=spiro_steps,
-                      spiro_line_width=spiro_line_width);
-        }
-
-        // the bottom spiro graph
-        spiro(radius/2 + 0.4, spiro_line_width, bottom_thick, spiro_steps);
-        cylinder(h=1,r=radius+0.9);
-        tube(radius+1.1, spiro_line_width, bottom_thick);
+        translate([0,0,box_height])
+            rotate([180,0,0])
+            container_lid_with_latches(box_height=box_height,
+                  radius=radius,
+                  minor_radius=minor_radius,
+                  wall_thick=wall_thick,
+                  bottom_thick=bottom_thick,
+                  spiro_steps=spiro_steps,
+                  spiro_line_width=spiro_line_width);
     }
 }
 
@@ -154,9 +164,7 @@ module container_with_pin(box_height, radius, minor_radius, wall_thick, bottom_t
 
     union() {
         difference() {
-            holy_squished_hollow_torus(box_height, radius, wall_thick, bottom_thick+3, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around, minor_radius);
-            translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
-            translate([0,0,box_height-bottom_thick-fitting_windage_snug]) cylinder(h=bottom_thick+10,r=radius+10);
+            generic_container(box_height, radius, minor_radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around);
 
             translate([0,0,box_height])
                 rotate([180,0,0])
@@ -168,11 +176,6 @@ module container_with_pin(box_height, radius, minor_radius, wall_thick, bottom_t
                       spiro_steps=spiro_steps,
                       spiro_line_width=spiro_line_width);
         }
-
-        // the bottom spiro graph
-        spiro(radius/2 + 0.5, spiro_line_width, bottom_thick, spiro_steps);
-        cylinder(h=1,r=radius+1);
-        tube(radius+1, spiro_line_width, bottom_thick);
 
         // The hole to hold the lid
         translate([radius-2,0,box_height-bottom_thick-pin_attachment_h])
@@ -193,8 +196,6 @@ module container_with_pin(box_height, radius, minor_radius, wall_thick, bottom_t
         }
     }
 }
-
-
 
 module detents(radius, wall_thick,negative=0)
 {
@@ -230,9 +231,8 @@ module latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_s
     }
 }
 
-module container_lid_with_latches(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width)
+module generic_lid(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width)
 {
-    echo ("lid: minor_radius", minor_radius);
     union() {
 
         // matching curve of box
@@ -245,25 +245,22 @@ module container_lid_with_latches(box_height, radius, minor_radius, bottom_thick
         // outside tube and spirograph
         tube(radius+1, spiro_line_width, bottom_thick);
         spiro(radius/2 + 0.5, spiro_line_width, bottom_thick, spiro_steps);
+    }
+}
 
+module container_lid_with_latches(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width)
+{
+    union() {
+        generic_lid(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
         latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
         rotate([0,0,180])
             latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
-
-
-        // detents
-        translate([0,0,bottom_thick])
-            detents(radius, wall_thick,negative=0);
     }
 }
 
 module container_lid_with_pin(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width) {
     union() {
-        difference() {
-            squished_solid_torus(radius, minor_radius, box_height);
-            translate([0,0,-smidgen])cylinder(h=box_height+2*smidgen,r=radius);
-            translate([0,0,bottom_thick]) cylinder(h=box_height,r=radius+10);
-        }
+        generic_lid(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
 
         latch(box_height, radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
         
@@ -273,14 +270,6 @@ module container_lid_with_pin(box_height, radius, minor_radius, bottom_thick, wa
             cylinder(h=bottom_thick+1,r=4);
         translate([radius-2,0,bottom_thick])
             pin(h=10,r=4,lh=3,lt=1);
-
-        // outside tube and spirograph
-        tube(radius+1, spiro_line_width, bottom_thick);
-        spiro(radius/2 + 0.5, spiro_line_width, bottom_thick, spiro_steps);
-
-        // detents
-        translate([0,0,bottom_thick])
-            detents(radius, wall_thick,negative=0);
     }
 }
 
