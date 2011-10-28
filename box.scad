@@ -6,7 +6,6 @@ use <container_module.scad>;
 //$fs=1;    // minimum fragment size
 //$fa=12;   // minimum fragment angle
 //$fn=0;   // exact number of segments to use. '0' means use $fs and $fa
-//$fn=10;   // exact number of segments to use. '0' means use $fs and $fa
 
 box_height=70;
 radius=40;
@@ -17,9 +16,9 @@ spiro_line_width=1.5;
 minor_radius=5;
 
 hole_len=12;
-distance_between_holes=1;
+distance_between_holes=4;
 hole_rotation_angle = 60;
-num_divisions_around = 10;
+num_divisions_around = 12;
 
 if (layout=="preview"){
     container_with_latches(box_height=box_height, 
@@ -35,7 +34,7 @@ if (layout=="preview"){
               num_divisions_around=num_divisions_around);
     translate([0,0,box_height])
         rotate([180,0,0])
-        container_lid_with_latches(box_height=box_height,
+        spiro_container_lid_with_latches(box_height=box_height,
                       radius=radius,
                       minor_radius=minor_radius,
                       wall_thick=wall_thick,
@@ -59,7 +58,7 @@ if (layout=="box"){
 }
 
 if (layout=="lid"){
-    container_lid_with_latches(box_height=box_height,
+    spiro_container_lid_with_latches(box_height=box_height,
                   radius=radius,
                   minor_radius=minor_radius,
                   wall_thick=wall_thick,
