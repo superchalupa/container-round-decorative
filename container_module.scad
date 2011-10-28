@@ -5,6 +5,7 @@ use <pins.scad>;
 
 // use this when subtracting surfaces and we want to make sure they dont coincide
 smidgen = 0.5;
+tiniest_smidgen = 0.05;
 
 // use this when parts have to fit together 
 fitting_windage_loose=0.350;
@@ -238,7 +239,8 @@ module latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_s
 
             translate([0,0,-smidgen])
                 cylinder(r=radius, h=box_height);
-            squished_solid_torus(radius+0.1, minor_radius, box_height);
+            translate([0,0,-tiniest_smidgen])
+                squished_solid_torus(radius, minor_radius, box_height);
         }
 
         latch_detent(radius, minor_radius, bottom_thick);
