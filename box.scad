@@ -1,4 +1,4 @@
-layout="preview";
+layout="preview-latches";
 echo ("Running build for layout", layout);
 
 use <container_module.scad>;
@@ -20,7 +20,17 @@ distance_between_holes=4;
 hole_rotation_angle = 60;
 num_divisions_around = 12;
 
-if (layout=="preview"){
+if (layout=="holes"){
+    holes(height=box_height-(bottom_thick+3)*2,
+          radius=radius,
+          minor_radius=minor_radius,
+          hole_len=hole_len,
+          distance_between_holes=distance_between_holes,
+          hole_rotation_angle=hole_rotation_angle,
+          num_divisions_around=num_divisions_around);
+}
+
+if (layout=="preview-latches"){
     container_with_latches(box_height=box_height, 
               radius=radius,
               minor_radius=minor_radius,
@@ -43,7 +53,7 @@ if (layout=="preview"){
                       spiro_line_width=spiro_line_width);
 }
 
-if (layout=="box"){
+if (layout=="box-latches"){
     container_with_latches(box_height=box_height,
               radius=radius,
               minor_radius=minor_radius,
@@ -57,8 +67,55 @@ if (layout=="box"){
               num_divisions_around=num_divisions_around);
 }
 
-if (layout=="lid"){
+if (layout=="lid-latches"){
     spiro_container_lid_with_latches(box_height=box_height,
+                  radius=radius,
+                  minor_radius=minor_radius,
+                  wall_thick=wall_thick,
+                  bottom_thick=bottom_thick,
+                  spiro_steps=spiro_steps,
+                  spiro_line_width=spiro_line_width);
+}
+
+if (layout=="preview-pin"){
+    container_with_pin(box_height=box_height, 
+              radius=radius,
+              minor_radius=minor_radius,
+              wall_thick=wall_thick,
+              bottom_thick=bottom_thick,
+              spiro_steps=spiro_steps,
+              spiro_line_width=spiro_line_width,
+              hole_len=hole_len,
+              distance_between_holes=distance_between_holes,
+              hole_rotation_angle=hole_rotation_angle,
+              num_divisions_around=num_divisions_around);
+    translate([0,0,box_height])
+        rotate([180,0,0])
+        spiro_container_lid_with_pin(box_height=box_height,
+                      radius=radius,
+                      minor_radius=minor_radius,
+                      wall_thick=wall_thick,
+                      bottom_thick=bottom_thick,
+                      spiro_steps=spiro_steps,
+                      spiro_line_width=spiro_line_width);
+}
+
+if (layout=="box-pin"){
+    container_with_pin(box_height=box_height,
+              radius=radius,
+              minor_radius=minor_radius,
+              wall_thick=wall_thick,
+              bottom_thick=bottom_thick,
+              spiro_steps=spiro_steps,
+              spiro_line_width=spiro_line_width,
+              hole_len=hole_len,
+              distance_between_holes=distance_between_holes,
+              hole_rotation_angle=hole_rotation_angle,
+              num_divisions_around=num_divisions_around);
+}
+
+if (layout=="lid-pin"){
+    spiro_container_lid_with_pin(box_height=box_height,
                   radius=radius,
                   minor_radius=minor_radius,
                   wall_thick=wall_thick,
