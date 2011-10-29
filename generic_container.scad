@@ -1,17 +1,11 @@
-layout="preview";
+include <constants.scad>;
+include <common_parameters.scad>;
+
+layout="preview-generic";
 echo ("Running build for", layout);
 
 use <holes.scad>;
 use <torus.scad>;
-use <pins.scad>;
-
-// use this when subtracting surfaces and we want to make sure they dont coincide
-smidgen = 0.5;
-tiniest_smidgen = 0.05;
-
-// use this when parts have to fit together 
-fitting_windage_loose=0.350;
-fitting_windage_snug=0.250;
 
 module generic_container(box_height, radius, minor_radius, wall_thick, bottom_thick, spiro_steps, spiro_line_width, hole_len, distance_between_holes, hole_rotation_angle, num_divisions_around) 
 {
@@ -109,9 +103,6 @@ module generic_lid(box_height, radius, minor_radius, bottom_thick, wall_thick, s
 }
 
 
-include <constants.scad>;
-include <common_parameters.scad>;
-layout="preview-generic";
 if (layout=="preview-generic"){
     generic_container(box_height=box_height, 
               radius=radius,
