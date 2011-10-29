@@ -1,4 +1,5 @@
-use <container_module.scad>;
+use <torus.scad>;
+use <holes.scad>;
 
 //$fs=1;    // minimum fragment size
 //$fa=12;   // minimum fragment angle
