@@ -1,9 +1,11 @@
+include <constants.scad>;
 
 module holes(height=35, radius=35, minor_radius=5, hole_len=12, distance_between_holes=1, hole_rotation_angle=60, num_divisions_around=20) {
     oval_maj_rad=hole_len/2;
     y_step = sin(hole_rotation_angle) * (oval_maj_rad*2+distance_between_holes);
     num_big_ovals = floor(height/y_step);
     degrees_per_y =  360 * tan(90-hole_rotation_angle) / (2 * 3.141592 * radius);
+    leftover = height - num_big_ovals * y_step;
     echo ("height: ", height);
     echo ("y_step: ", y_step);
     echo ("num big ovals: ", num_big_ovals);
@@ -12,6 +14,8 @@ module holes(height=35, radius=35, minor_radius=5, hole_len=12, distance_between
     // Ok, this was a pain to come up with, but basically here we chop holes in the sides
     // outer loop copies each individual vertical 'line' around the circumference
     // inner loop does one individual 'line' of holes going up
+    translate([0,0,leftover/2])
+    union() {
     for (i=[0:num_divisions_around-1]) {
         // first row
         for (j=[0:num_big_ovals-1]) {
@@ -51,9 +55,9 @@ module holes(height=35, radius=35, minor_radius=5, hole_len=12, distance_between
             scale([1.5/oval_maj_rad,1/2,1])
             cylinder(h=minor_radius*2+smidgen*2,r1=oval_maj_rad, r2=oval_maj_rad);
     }
+    }
 }
 
-include <constants.scad>;
 include <common_parameters.scad>;
 layout="holes";
 if (layout=="holes"){

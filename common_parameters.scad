@@ -1,6 +1,6 @@
 box_height=70;
 radius=40;
-wall_thick=3;
+wall_thick=4;
 spiro_steps = 20;
 bottom_thick=3;
 spiro_line_width=1.5;

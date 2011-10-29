@@ -4,6 +4,8 @@ include <common_parameters.scad>;
 layout="preview-generic";
 echo ("Running build for", layout);
 
+generic_container_version = "1.1";
+
 use <holes.scad>;
 use <torus.scad>;
 
@@ -38,9 +40,9 @@ module generic_container(box_height, radius, minor_radius, wall_thick, bottom_th
 module detents(radius, minor_radius, wall_thick, bottom_thick)
 {
         // detents
-        translate([0, (radius+smidgen), 0.4])
+        translate([0, (radius-1), 0.4])
             cube( [ wall_thick,  wall_thick, 1.1], center=true);
-        translate([0,-(radius+smidgen), 0.4])
+        translate([0,-(radius-1), 0.4])
             cube( [ wall_thick,  wall_thick, 1.1], center=true);
 }
 
@@ -50,15 +52,13 @@ module latch_detent(radius, minor_radius, bottom_thick)
     clip_midpoint_h = 5;
     clip_w = 10;
 
-    union() {
-        translate([-radius-minor_radius,0,bottom_thick+clip_midpoint_h])
-            difference() {
-                rotate([90,0,0])
-                    cylinder(h=10,r=clip_r,center=true);
-    
-                translate([ -2*clip_r,  -clip_w,  -clip_r  -smidgen])
-                    cube([2*clip_r, 2*clip_w, 2*clip_r+2*smidgen]);
-            }
+    translate([-radius-minor_radius,0,bottom_thick+clip_midpoint_h])
+    difference() {
+        rotate([90,0,0])
+            cylinder(h=clip_w,r=clip_r,center=true);
+
+        translate([ -2*clip_r,  -clip_w,  -clip_r  -smidgen])
+            cube([2*clip_r, 2*clip_w, 2*clip_r+2*smidgen]);
     }
 }
 
@@ -74,7 +74,7 @@ module latch(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_s
                 cube([minor_radius,clip_w,bottom_thick+clip_midpoint_h]);
 
             translate([0,0,-smidgen])
-                cylinder(r=radius, h=box_height);
+                cylinder(r=radius, h=bottom_thick+clip_midpoint_h+smidgen*2);
             translate([0,0,-tiniest_smidgen])
                 squished_solid_torus(radius, minor_radius, box_height);
         }
@@ -96,9 +96,9 @@ module generic_lid(box_height, radius, minor_radius, bottom_thick, wall_thick, s
         // outside tube and spirograph
         tube(radius, spiro_line_width, bottom_thick);
 
-        // and rotational detents to prevent rotation
-        translate([0,0,bottom_thick])
-            detents(radius, minor_radius, bottom_thick, wall_thick);
+//        // and rotational detents to prevent rotation
+//        translate([0,0,bottom_thick])
+//            detents(radius, minor_radius, bottom_thick, wall_thick);
     }
 }
 

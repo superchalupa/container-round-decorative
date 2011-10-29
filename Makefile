@@ -1,12 +1,21 @@
-ALL_BOX_STLS := holes.stl lid-latches.stl lid-pin.stl box-latches.stl box-pin.stl preview-latches.stl preview-pin.stl
-all: $(ALL_BOX_STLS) bracelet.stl
+LATCH_STL := lid-latches.stl box-latches.stl preview-latches.stl
+PIN_STL := lid-pin.stl box-pin.stl preview-pin.stl
 
-$(ALL_BOX_STLS): box.scad
-	openscad -o $@ $< -Dlayout=\"$$(basename $@ .stl)\"
+all: $(LATCH_STL) $(PIN_STL)
 
-bracelet.scad box.scad: container_module.scad
-box.cad: container_module.scad
-container_module.scad: pins.scad
+-include $(LATCH_STL:.stl=.dep)
+-include $(PIN_STL:.stl=.dep)
+-include bracelet.dep
+-include holes.dep
+
+$(LATCH_STL): latch_container.scad
+	time openscad -d $(basename $@).dep -o $@ $< -Dlayout=\"$(basename $@)\"
+
+$(PIN_STL): pin_container.scad
+	time openscad -d $(basename $@).dep -o $@ $< -Dlayout=\"$(basename $@)\"
+
+bracelet.stl: bracelet.scad
+holes.stl: holes.scad
 
 pins.scad:
 	sh ./get_thing.sh 10541
@@ -16,4 +25,4 @@ clean:
 	rm *.stl *.gcode
 
 %.stl: %.scad
-	openscad -o $@ $< -Dlayout=\"$$(basename $@ .stl)\"
+	time openscad -d $(basename $@).dep -o $@ $< -Dlayout=\"$(basename $@)\"
