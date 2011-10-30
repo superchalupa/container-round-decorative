@@ -44,7 +44,7 @@ module spiro_container_lid_with_latches(box_height, radius, minor_radius, bottom
         generic_container_lid_with_latches(box_height, radius, minor_radius, bottom_thick, wall_thick, spiro_steps, spiro_line_width);
 
         // make a ring detent to positively engage top of box
-        tube(radius-fitting_windage_snug, spiro_line_width-fitting_windage_snug, bottom_thick+1);
+        tube(radius-fitting_windage_snug, spiro_line_width-fitting_windage_snug, bottom_thick+2);
 
         spiro(radius/2, spiro_line_width, bottom_thick, spiro_steps);
     }
