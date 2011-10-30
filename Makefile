@@ -1,7 +1,7 @@
 LATCH_STL := lid-latches.stl box-latches.stl preview-latches.stl
 PIN_STL := lid-pin.stl box-pin.stl preview-pin.stl
 
-all: $(LATCH_STL) $(PIN_STL)
+all: $(LATCH_STL) $(PIN_STL) bracelet.stl holes.stl
 
 -include $(LATCH_STL:.stl=.dep)
 -include $(PIN_STL:.stl=.dep)
